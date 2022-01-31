@@ -1,0 +1,102 @@
+Game Records
+
+12/1/2022
+- Animation function is set up to work for player
+
+13/1/2022
+- Cannonball is able to be drawn when player fire
+- Cannonball adds only 1 instance when player fire
+- Cannonball is able to adjust direction based on player direction
+
+17/1/2022
+- Cannonball is now able to rebounce 
+	- Take note that direction of cannonball is controlled by AdjustedDirection function which is constantly called in GameRun Function
+- Player is able to go against  cannonball
+- VelX needs to be a sum of all the velX changes applied in one messaging loop
+
+19/1/2022
+- Cannonball is able to rebound when player hits terrain instead
+- Vector sum of velX for player is implemented
+- Cannonball collision with player is working
+- Player is able to go against cannonball
+- Player is able to sometimes glitch through cannonball when player collide terrain or multiple cannonballs is available
+- Cannonball Movement code comes before player
+- Add condition for player velx, such that when collision with cannonballobjects, only be concerned with collision with terrain
+
+21/1/2022
+- Vector sum of velX for player currently removed as it results in huge magnitude in movement
+- Multiple cannonball will allow player to glitch through the balls
+- When player collide with cannonball, player x movement is too large and laggy
+- Decision to accept this outcome
+
+22/1/2022
+- Applied Linear Interpolation method to smooth out movement of ball with Approach Function
+- Multiple cannonball will allow player to glitch through the balls
+- Ball did not rebound upon collision with terrain
+- Problems applying this method to player as player automatically set velx to 0 every loop (Fixed)
+	- Removed player velx to 0 after every loop
+	- This also means player may not have too controlled of a movement if modifier is small for approach function
+	- Perhaps modifier can be increased to allow players to have greater control
+
+23/1/2022
+- Multiple cannonball will allow player to glitch through the balls
+- Ball did not rebound upon collision with terrain(Fixed) 
+	- Fix ball rebounding by editing the Approach function to properly work with changes in x values
+	- Ball able to rebound terrain, both velx and vely  linearly interpolate to 0 to appear realistic
+	- Ball appear to lose energy the longer it travels
+- Player velocity increases to the point it can teleport over walls(Fixed) 
+	- Player velocity is set to 0 in collision with terrain
+- Cannonball doesnt collide with player properly(Fixed) 
+	- This is due to the fact that the cannonballobjects[i] in player combined movement is incorrect as that does represent the cannonball index colliding with player
+- Firing of cannonball needs to be redone for cannonball position when fired(Fixed)
+	- Cannonball firing will not be on left/right of player and if there is terrain very close to player, player would not be able to fire in that direction
+- Define conditions for when player is being pushed by cannonball
+
+24/1/2022
+- Multiple cannonball will allow player to glitch through the balls
+	- When player uses input against cannonball, cannonball appears to go slower
+	- When cannonball are colliding in opposite direction of player, it might go through player
+	- While using recursion collision detection to check for cannonball collision, resulted in stack overflow when cannonball pushes cannonball to wall
+		- this could be due to player taking prev coords while cannonball continue to move
+- Player is able to force cannonball to a stop when there is player input as velx changes (Fixed)
+	- Placed PlayerControl and Cooldown functions inside PlayerCombinedMovementFunction so player cant force cannonball to stop as CannonballCollision is the last change in vel of player
+
+25/1/2022
+- Collision is only taken into account after both Player and Cannonball has Moved
+	- Scenario 1 Cannonball moved foward and has already collided, player continues to move first then check for collision; Cannonball and player moving to each other
+	- Scenario 2 Cannonball and player moving in same direction
+	- A function that takes the different scenarios of collision into account and sets the appropriate values for the objects
+		- Has yet to show effectiveness, to troubleshoot again
+
+26/1/2022
+- Colliding with Terrain causes stack overflow(Fixed)
+	- Slight change to the way the CollisionScenarios functions by setting only when cannonball and player faces the same way will it shift cannonball coords only, all other circumstance will shift both cannonball and player coords
+- Colliding with cannonball after firing 2 cannonball causes stack overflow(Fixed)
+	- Removed Recursion function as there is no need for the player to check again and again until there is no collision
+	- There is only one store prevcoord value so maximum collision in one turn is twice
+	- Changed the Recursion function to CannonballCollisionAgain() which basically sets whichever cannonball collided back to prevcoord
+- Added same code for Y axis 
+- When character is sandwiched between two cannonball, character velocity is not zero, and cannonball does not really rebound
+- Time to work towards map design and adding an extra player instance with different set of Player controls
+
+27/1/2022
+- When cannonball or player go out of map borders, they trigger the death boolean variable, and they should not be drawn
+- Player should be deleted and gamestate should change to dead
+- Cannonball should be deleted and gamestate should change to dead
+- Adding Player 2 to the game with different Player Controls
+- Direction for player and cannonball was both not working properly (Fixed)
+	- Changed the CollisionScenario function to check for speed as well
+	- Make sure every loop direction is aligned based on velocity signage
+- Added Second Player into the game 
+- Added Playercontrol values into player class so players can change their control keys
+- Cannonball is not properly shooting out in the correct direction when against a wall or if there is player nearby (Fixed)
+	- Changed the Fire function such that to also take into account collision with players
+	- this prevent cannonball from spawning another player if the player is beside each other
+
+WIP
+- Designing a new spritesheet for terrain
+- Simple Terrain design for trial testing
+- Game Menu
+- Sound when firing cannonball and Gameover
+- Countdown before game start
+- Adding buttons into game   
