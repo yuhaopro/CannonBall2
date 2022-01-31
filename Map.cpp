@@ -3,7 +3,7 @@
 using namespace std;
 //file for terrain generation
 const int Xstart = 10, Xend = MAPTILEWIDTH - 10;
-
+int SpawnY;
 
 bool** Terrain(LPDIRECT3DSURFACE9 source, LPDIRECT3DSURFACE9 dest)
 {
@@ -11,25 +11,20 @@ bool** Terrain(LPDIRECT3DSURFACE9 source, LPDIRECT3DSURFACE9 dest)
 	int row = MAPTILEHEIGHT;
 	bool** array = new bool* [MAPTILEHEIGHT];
 	int walltopY = 42; //total height is 96
+	SpawnY = (walltopY - 11) * TILEHEIGHT;
 	for (int y = 0; y < MAPTILEHEIGHT; y++)
 	{
 		array[y] = new bool[MAPTILEWIDTH];
 		for (int x = 0; x < MAPTILEWIDTH; x++)
 		{
-			if ((y == walltopY - 10) && x == Xstart)
+			if ((y == walltopY - 10) && (x > Xstart && x <	MAPTILEWIDTH / 2 - 10))
 			{
-				DrawTiles(source, 48, 16, 16, 16, dest, x * TILEWIDTH, y * TILEHEIGHT);
+				DrawTiles(source, 32, 0, 16, 16, dest, x * TILEWIDTH, y * TILEHEIGHT);
 				array[y][x] = TRUE;
 			}
-			else if (y == walltopY - 1 && x == Xstart)
+			else if ((y == walltopY - 10) && ((x > MAPTILEWIDTH / 2 + 10) && x < Xend))
 			{
-				//drawing block in middle
-				DrawTiles(source, 48, 16, 16, 16, dest, x * TILEWIDTH, y * TILEHEIGHT);
-				array[y][x] = TRUE;
-			}
-			else if (y == walltopY - 1 && x == Xend)
-			{
-				DrawTiles(source, 48, 16, 16, 16, dest, x * TILEWIDTH, y * TILEHEIGHT);
+				DrawTiles(source, 32, 0, 16, 16, dest, x * TILEWIDTH, y * TILEHEIGHT);
 				array[y][x] = TRUE;
 			}
 			//drawing platform

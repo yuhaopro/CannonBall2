@@ -144,13 +144,3 @@ public:
 	~Cannonball() {}
 };
 
-class AI : public Sprite
-{
-private:
-	bool direction;
-	Cannonball* cannonball;
-public:
-	void AIMoveX(Player* player);
-	void AIMoveY(Player* player);
-	void AIFire(Cannonball* cannonball);
-};

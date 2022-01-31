@@ -8,6 +8,7 @@ LPDIRECT3D9 d3d = NULL;
 LPDIRECT3DDEVICE9 d3ddev = NULL;
 LPDIRECT3DSURFACE9 backbuffer = NULL;
 LPD3DXSPRITE spriteobj = NULL;
+LPD3DXSPRITE fontspriteobj = NULL;
 
 //Direct Input variables
 LPDIRECTINPUT8 dinput = NULL;
@@ -56,8 +57,9 @@ bool Direct3D_Init(HWND window, int width, int height)
 	//get a pointer to the backbuffer surface
 	d3ddev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
 
-	//create sprite object
+	//create player sprite object
 	D3DXCreateSprite(d3ddev, &spriteobj);
+	D3DXCreateSprite(d3ddev, &fontspriteobj);
 
 
 	return true;
@@ -247,21 +249,36 @@ LPD3DXFONT MakeFont(string name, int size)
 		OUT_TT_PRECIS, //output precision
 		CLIP_DEFAULT_PRECIS,//quality
 		DEFAULT_PITCH, //pitch and family
-		"" //font name
+		"Press Start 2P" //font name
 	};
 	strcpy_s(desc.FaceName, name.c_str());
-	D3DXCreateFontIndirect(d3ddev, &desc, &font);
+	HRESULT result = D3DXCreateFontIndirect(d3ddev, &desc, &font);
+	if (result != S_OK)
+	{
+		return NULL;
+	}
 	return font;
 
 }
 
-int FontPrint(LPD3DXFONT font, int x, int y, string text, D3DCOLOR white)
+vector<int> FontCalculateVector(LPD3DXFONT font,int x, int y, string text, D3DCOLOR white)
 {
 	//figure out text boundary 
 	int width;
+	float scaling = 1.0f;
+	float rotation = 0.0f;
+	
 	RECT rect = { x, y, 0, 0 };
-	font->DrawText(NULL, text.c_str(), text.length(), &rect, DT_CALCRECT, white); //formats the right side of the rect to contain string
-	font->DrawText(spriteobj, text.c_str(), text.length(), &rect, DT_LEFT, white); //print text to sprite obj
+
+	/*
+	* USAGE OF DT_CALCRECT FLAG	
+		Determines the width and height of the rectangle. 
+		If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. 
+		If there is only one line of text,
+		DrawText modifies the right side of the rectangle so that it bounds the last character in the line. 
+		In either case, DrawText returns the height of the formatted text but does not draw the text.
+	*/
+	int height = (int)font->DrawText(NULL, text.c_str(), text.length(), &rect, DT_CALCRECT, white);  //Essentially extends the rectangle to cover the last char of the string 
 
 	if (rect.left > rect.right)
 	{
@@ -271,5 +288,20 @@ int FontPrint(LPD3DXFONT font, int x, int y, string text, D3DCOLOR white)
 	{
 		width = rect.right - rect.left;
 	}
-	return width;
+	// Drawing in center instead of top left coords for rect
+	rect.left = x -width / 2;
+	sprintf_s(str, sizeof(str), "StringWidth: %d, StringHeight: %d\n", width, height);
+	OutputDebugStringA(str);
+
+	rect.top = y -height / 2;
+	rect.right = rect.left + width;
+	rect.bottom = rect.top + height;
+
+
+	SettingSpriteObject(fontspriteobj, scaling, 0, 0, 0, 0, rotation);
+	font->DrawText(fontspriteobj, text.c_str(), text.length(), &rect, DT_CENTER, white);
+	vector<int> Fontvector;
+	Fontvector.push_back(width);
+	Fontvector.push_back(height);
+	return Fontvector;
 }

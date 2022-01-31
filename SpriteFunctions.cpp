@@ -334,7 +334,6 @@ void Sprite::CombinedMovementFunction(float &deltatime, float &prevcoord, bool &
 
 float Sprite::ApproachFunction(float goal, float currentvelx, float deltatime)
 {
-	char str[256];
 	bool flag = false; //if true, means direction is defined
 	bool direction; //true for right, false for left
 	float difference; //always positive value

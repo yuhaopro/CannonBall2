@@ -17,28 +17,30 @@ const float friction = 50;
 
 //game world dimensions
 
-LARGE_INTEGER startingtime, endingtime, timestep;
-LARGE_INTEGER frequency;
+LARGE_INTEGER startingtime, endingtime, timestep, frequency;
 bool** collisionmap;
-ULONGLONG Wsleeptime = 2000, Wtimer = 0, Stimer = 0;
 float deltatime;
-string gamestate = "idle";
+string gamestate;
 vector<Sprite*> collidables;
 vector<Cannonball*> cannonballobjects;
 vector <Player*> playersarray;
 char str[256];
 Player* player;
 Player* player2;
+bool CountDownOver = false;
+float countdowntimer;
+string playerstring;
 
 
-//font objsS
-LPD3DXFONT ARIAL32 = NULL;
-LPD3DXFONT TIMESNEWROMAN20 = NULL;
-string boop = "Welcome to Game Progamming";
+//font objs
+LPD3DXFONT BITFONT80 = NULL;
+LPD3DXFONT BITFONT48 = NULL;
+LPD3DXFONT BITFONT20 = NULL;
+vector<string> CountdownString;
 
 LPDIRECT3DSURFACE9 gamemap = NULL;
 LPDIRECT3DSURFACE9 spritesheet = NULL; //to load map tiles 
-
+D3DCOLOR White = D3DCOLOR_XRGB(255,255,255);
 
 
 bool Game_Init(HWND window)
@@ -71,7 +73,7 @@ bool Game_Init(HWND window)
 	spritesheet = LoadSurface("files/dungeon.png");
 	collisionmap = Terrain(spritesheet, gamemap);
 	//Loading Player Texture and animation configurations
-	player = new Player(SCREENW / 2, SCREENH / 2);
+	player = new Player(SCREENW / 2 - 15 * TILEWIDTH, (float)SpawnY);
 	player->LoadTexture(d3ddev, "files/dungeon.png", player->color);
 	player->SetSourceCoords(368, 80);  
 	player->delay = 100;
@@ -84,7 +86,7 @@ bool Game_Init(HWND window)
 	collidables.push_back(player);
 	playersarray.push_back(player);
 
-	player2 = new Player(SCREENW / 2, SCREENH / 2);
+	player2 = new Player(SCREENW / 2 + 15 * TILEWIDTH, (float)SpawnY);
 	player2->LoadTexture(d3ddev, "files/dungeon.png", player2->color);
 	player2->SetSourceCoords(368, 80);
 	player2->delay = 100;
@@ -96,6 +98,34 @@ bool Game_Init(HWND window)
 	player2->FireKey = DIK_DOWN;
 	collidables.push_back(player2);
 	playersarray.push_back(player2);
+
+	//Adding 8Bit Font
+	AddFontResourceEx("files/8Bit.ttf",NULL,0);
+	//Font name
+	string FontName = "Press Start 2P";
+	BITFONT80 = MakeFont(FontName, TILEHEIGHT * 5); //SIZE OF FONT IN SECOND PARAM
+	if (BITFONT80 == NULL)
+	{
+		return false;
+	}
+	BITFONT48 = MakeFont(FontName, TILEHEIGHT * 3); //SIZE OF FONT IN SECOND PARAM
+	if (BITFONT48 == NULL)
+	{
+		return false;
+	}
+	BITFONT20 = MakeFont(FontName, 20); //SIZE OF FONT IN SECOND PARAM
+	if (BITFONT20 == NULL)
+	{
+		return false;
+	}
+
+	//variables initialisation
+	gamestate = "idle";
+	countdowntimer = 0;
+	CountdownString = { "3","2","1" };
+	CountDownOver = false;
+
+	
 
 	return true;
 }
@@ -109,26 +139,41 @@ void Game_Run(HWND window)
 		OutputDebugStringA("Direct3D Device failed");
 		return;
 	}
-	//high resolution timer
-	QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&startingtime);
 
 	//update the input devices
 	DirectInput_Update();
 
-	//cannonball movement
-	for (int i = 0; i < (int)cannonballobjects.size(); i++)
+	//high resolution timer
+	QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&startingtime);
+
+	if (CountDownOver)
 	{
-		cannonballobjects[i]->CombinedMovementFunction(deltatime, cannonballobjects[i]->deleteball);
+
+		//cannonball movement
+		for (int i = 0; i < (int)cannonballobjects.size(); i++)
+		{
+			cannonballobjects[i]->CombinedMovementFunction(deltatime, cannonballobjects[i]->deleteball);
+		}
+
+
+		//simulate player movement to check if x should be moved
+		for (int i = 0; i < (int)playersarray.size(); i++)
+		{
+			playersarray[i]->CombinedMovementFunction(deltatime, playersarray[i]->dead);
+		}
 	}
-
-
-	//simulate player movement to check if x should be moved
-	for (int i = 0; i < (int)playersarray.size(); i++)
+	else
 	{
-		playersarray[i]->CombinedMovementFunction(deltatime, playersarray[i]->dead);
+		if (countdowntimer > 3)
+		{
+			CountDownOver = true;
+		}
+		else
+		{
+			countdowntimer += deltatime;
+		}
 	}
-
 
 	//clear the backbuffer
 	d3ddev->ColorFill(backbuffer, NULL, D3DCOLOR_XRGB(0, 0, 0));
@@ -143,8 +188,20 @@ void Game_Run(HWND window)
 
 		//start drawing
 		d3ddev->StretchRect(gamemap, NULL, backbuffer, NULL, D3DTEXF_NONE);
+
+		//Drawing Countdown Numbers
+		fontspriteobj->Begin(D3DXSPRITE_ALPHABLEND);
+
+		double temp = floor((double)countdowntimer);
+		if ((int)temp < 3)
+		{
+			vector<int> CountdownFont = FontCalculateVector(BITFONT80, SCREENW / 2, SCREENH / 2, CountdownString[(int)temp], White);
+		}
+		fontspriteobj->End();
+
+		//Drawing Sprites
 		spriteobj->Begin(D3DXSPRITE_ALPHABLEND);
-		
+		//Drawing Players
 		for (int i = 0; i < (int)playersarray.size(); i++)
 		{
 			if (!playersarray[i]->dead)
@@ -152,6 +209,29 @@ void Game_Run(HWND window)
 				playersarray[i]->Draw(spriteobj);
 				sprintf_s(str, sizeof(str), "playerdirection: %d\n", playersarray[i]->ReadDirectionLR());
 				OutputDebugStringA(str);
+			}
+			else
+			{
+				//TODO after one player die
+				if (i == 0) //player 1 died
+				{
+					playerstring = "Player 1";
+				}
+				else //player 2 died
+				{
+					playerstring = "Player 2";
+				}
+				string VictoryMessage = playerstring + " Has Won!";
+				string Restart = "Press Space to Restart\n";
+				fontspriteobj->Begin(D3DXSPRITE_ALPHABLEND);
+				vector<int> VictoryFont = FontCalculateVector(BITFONT48, SCREENW / 2, SCREENH / 2, VictoryMessage, White);
+				FontCalculateVector(BITFONT20, SCREENW / 2, SCREENH / 2 + VictoryFont[1], Restart, White);
+				fontspriteobj->End();
+				CountDownOver = false;
+				if (Key_Down(DIK_SPACE))
+				{
+					gamestart = false;
+				}
 			}
 		}
 
@@ -189,9 +269,10 @@ void Game_Run(HWND window)
 	}
 
 	//escape key exits
-	if (Key_Down(DIK_SPACE) || Key_Down(DIK_ESCAPE))
+	if (Key_Down(DIK_ESCAPE))
 	{
 		gameover = true;
+		gamestart = false;
 	}
 	QueryPerformanceCounter(&endingtime);
 	timestep.QuadPart = endingtime.QuadPart - startingtime.QuadPart;
@@ -201,8 +282,10 @@ void Game_Run(HWND window)
 
 void Game_End()
 {
-	if (ARIAL32) ARIAL32->Release();
-	if (TIMESNEWROMAN20) TIMESNEWROMAN20->Release();
+	RemoveFontResourceEx("files/8Bit.ttf", NULL, 0);
+	if (BITFONT80) BITFONT80->Release();
+	if (BITFONT48) BITFONT48->Release();
+	if (BITFONT20) BITFONT20->Release();
 	spritesheet->Release();
 	gamemap->Release();
 	DirectInput_Shutdown();

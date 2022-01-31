@@ -2,6 +2,7 @@
 
 using namespace std;
 bool gameover = false;
+bool gamestart = false;
 #define APPLICATION_INSTANCE_MUTEX_NAME "{7C5CCAF4-229A-47D1-B545-8DFB8ACDCF3E}"
 //Window event callback function
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -84,8 +85,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		//process game loop
-		Game_Run(window);
+
+		if (gamestart)
+		{
+			Game_Run(window);
+		}
+		else
+		{
+			Menu(window);
+		}
 	}
 	//shutdown
 	Game_End();
