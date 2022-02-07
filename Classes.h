@@ -144,3 +144,45 @@ public:
 	~Cannonball() {}
 };
 
+/*
+	This Class is suppose to Process the WAV File and Produce the Sound, Only One instance will ever exist
+*/
+class Sound;
+
+class SoundSystem {
+private:
+	SoundSystem();
+	~SoundSystem();
+	static SoundSystem* SSInstance;
+	int nSourceVoice;
+public:
+	IXAudio2SourceVoice* pSourceVoice;
+	IXAudio2* pAudio;
+	IXAudio2MasteringVoice* pMasterVoice;
+public:
+	static SoundSystem* GetInstance();
+	HRESULT SoundPlay(Sound* object);
+	HRESULT CreateSourceVoice(Sound* object);
+
+};
+
+/*
+	To Prepare the SoundSystem for Processing the File
+*/
+class Sound {
+private:
+	string Filename;
+	HANDLE hFile;
+	HRESULT errorcode;
+	XAUDIO2_BUFFER buffer;
+	WAVEFORMATEXTENSIBLE wfx;
+
+	friend class SoundSystem;
+public:
+	Sound(string filename);
+	~Sound();
+	HRESULT OpenFile();
+	HANDLE GetFile();
+	HRESULT FindChunk(HANDLE& hFile, DWORD fourcc, DWORD& dwChunkSize, DWORD& dwChunkDataPosition);
+	HRESULT ReadChunkData(HANDLE& hFile, void* buffer, DWORD buffersize, DWORD bufferoffset);
+};

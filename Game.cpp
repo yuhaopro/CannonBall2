@@ -42,6 +42,10 @@ LPDIRECT3DSURFACE9 gamemap = NULL;
 LPDIRECT3DSURFACE9 spritesheet = NULL; //to load map tiles 
 D3DCOLOR White = D3DCOLOR_XRGB(255,255,255);
 
+SoundSystem* soundsystem;
+Sound* sound;
+
+
 
 bool Game_Init(HWND window)
 {
@@ -125,7 +129,10 @@ bool Game_Init(HWND window)
 	CountdownString = { "3","2","1" };
 	CountDownOver = false;
 
-	
+	//Sound System
+	soundsystem = SoundSystem::GetInstance();
+	sound = new Sound("files/shootsound.wav");
+	soundsystem->CreateSourceVoice(sound);
 
 	return true;
 }

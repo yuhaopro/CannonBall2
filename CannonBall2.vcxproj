@@ -157,6 +157,8 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="PlayerFunctions.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SoundSystem.cpp" />
     <ClCompile Include="SpriteFunctions.cpp" />
     <ClCompile Include="Windows.cpp" />
   </ItemGroup>
@@ -166,6 +168,9 @@
   <ItemGroup>
     <Image Include="CannonBall2.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Feedback.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

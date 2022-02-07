@@ -54,6 +54,7 @@ void Player::PlayerControl() // how movement of player is controlled
 			cooldownFire = true;
 			sprintf_s(str, sizeof(str), "cooldownfire: %d \n", cooldownFire);
 			OutputDebugStringA(str);
+			//soundsystem->pSourceVoice->Stop();
 		}
 	}
 	Cooldown(cooldownJump, cooldowntimerJump);
@@ -148,6 +149,9 @@ void Player::cannonballCreation()
 	cannonballobjects.back()->delay = 0;
 	cannonballobjects.back()->color = D3DCOLOR_XRGB(255, 255, 255);
 	collidables.push_back(cannonballobjects.back());
+
+	//play firesound
+	soundsystem->SoundPlay(sound);
 }
 //cooldown to be called whenever its true
 void Player::Cooldown(bool& cooldown, int &timer)

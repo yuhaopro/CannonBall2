@@ -1,0 +1,5 @@
+Access violation reading location when using Xaudio2
+To debug:
+	Check if Sound file is loaded properly
+	Check for size of Buffer and wfx
+	

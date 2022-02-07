@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <math.h>
+#include <xaudio2.h>
+#include <comdef.h>
 #include "Classes.h"
 
 //libraries
@@ -28,6 +30,24 @@
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "dxguid.lib")
+
+#ifdef _XBOX //Big-Endian
+#define fourccRIFF 'RIFF'
+#define fourccDATA 'data'
+#define fourccFMT 'fmt '
+#define fourccWAVE 'WAVE'
+#define fourccXWMA 'XWMA'
+#define fourccDPDS 'dpds'
+#endif
+
+#ifndef _XBOX //Little-Endian
+#define fourccRIFF 'FFIR'
+#define fourccDATA 'atad'
+#define fourccFMT ' tmf'
+#define fourccWAVE 'EVAW'
+#define fourccXWMA 'AMWX'
+#define fourccDPDS 'sdpd'
+#endif
 
 
 using namespace std;
@@ -79,6 +99,8 @@ extern LPD3DXFONT BITFONT20;
 extern vector<string> CountdownString;
 extern float countdowntimer;
 extern bool CountDownOver;
+extern SoundSystem* soundsystem;
+extern Sound* sound;
 
 //DIRECT3D functions
 bool Direct3D_Init(HWND hwnd, int width, int height);
@@ -118,8 +140,8 @@ void Game_End();
 void Menu(HWND window);
 void MenuExit();
 
-
 //map functions
 bool** Terrain(LPDIRECT3DSURFACE9 source, LPDIRECT3DSURFACE9 dest);
+
 
 

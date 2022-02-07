@@ -81,11 +81,11 @@ void GameInitialization()
 		playersarray[i]->ChangeVelY(0);
 		if (i == 0)
 		{
-			playersarray[i]->SetX(SCREENW / 2 - 15 * TILEWIDTH);
+			playersarray[i]->SetX((float)(SCREENW / 2 - 15 * TILEWIDTH));
 		}
 		else
 		{
-			playersarray[i]->SetX(SCREENW / 2 + 15 * TILEWIDTH);
+			playersarray[i]->SetX((float)(SCREENW / 2 + 15 * TILEWIDTH));
 		}
 		playersarray[i]->SetY((float)SpawnY);
 		playersarray[i]->dead = false;
