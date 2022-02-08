@@ -51,6 +51,7 @@ Sound::Sound(string filename) :Filename(filename), wfx({ 0 }), buffer({ 0 })
     }
     //Locating Audio Data
     BYTE* pDataBuffer = new BYTE[dwChunkSize];
+ 
     errorcode = ReadChunkData(hFile, pDataBuffer, dwChunkSize, dwChunkPosition);
     if FAILED(errorcode)
     {

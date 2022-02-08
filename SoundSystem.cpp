@@ -49,6 +49,7 @@ SoundSystem::~SoundSystem()
 HRESULT SoundSystem::SoundPlay(Sound* object)
 {
     HRESULT hr;
+    pSourceVoice->SetVolume(0.5);
     if (FAILED(hr = pSourceVoice->SubmitSourceBuffer(&object->buffer)))
     {
         OutputDebugStringA("Fail to submit\n");

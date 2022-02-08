@@ -154,7 +154,6 @@ private:
 	SoundSystem();
 	~SoundSystem();
 	static SoundSystem* SSInstance;
-	int nSourceVoice;
 public:
 	IXAudio2SourceVoice* pSourceVoice;
 	IXAudio2* pAudio;

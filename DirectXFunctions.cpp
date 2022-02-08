@@ -290,8 +290,8 @@ vector<int> FontCalculateVector(LPD3DXFONT font,int x, int y, string text, D3DCO
 	}
 	// Drawing in center instead of top left coords for rect
 	rect.left = x -width / 2;
-	sprintf_s(str, sizeof(str), "StringWidth: %d, StringHeight: %d\n", width, height);
-	OutputDebugStringA(str);
+	//sprintf_s(str, sizeof(str), "StringWidth: %d, StringHeight: %d\n", width, height);
+	//OutputDebugStringA(str);
 
 	rect.top = y -height / 2;
 	rect.right = rect.left + width;

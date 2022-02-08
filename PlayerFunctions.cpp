@@ -54,7 +54,6 @@ void Player::PlayerControl() // how movement of player is controlled
 			cooldownFire = true;
 			sprintf_s(str, sizeof(str), "cooldownfire: %d \n", cooldownFire);
 			OutputDebugStringA(str);
-			//soundsystem->pSourceVoice->Stop();
 		}
 	}
 	Cooldown(cooldownJump, cooldowntimerJump);
