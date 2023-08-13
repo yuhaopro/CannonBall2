@@ -1,5 +1,3 @@
-# CannonBall2
-
 # Description
 This is 2D Platform 2 Player Game.
 
